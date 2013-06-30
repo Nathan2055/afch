@@ -180,7 +180,7 @@ if (wgPageName.indexOf('Wikipedia:Articles_for_creation/Redirects') != -1) {
 						 ], 'afcHelper_redirect_onActionChange(' + afcHelper_RedirectSubmissions[k].id + ')')
 						 + '<div id="afcHelper_redirect_extra_' + afcHelper_RedirectSubmissions[k].id + '"></div></li>';
 			}
-			text += '</ul>';			
+			text += '</ul>';
 		}
 		text += '<input type="button" id="afcHelper_redirect_done_button" name="afcHelper_redirect_done_button" value="Done" onclick="afcHelper_redirect_performActions()" />';
 		displayMessage(text);
@@ -347,7 +347,7 @@ if (wgPageName.indexOf('Wikipedia:Articles_for_creation/Redirects') != -1) {
 					if(sub.comment != '')
 						text += '\n*\{\{afc comment|1=' + sub.comment +'\~\~\~\~\}\}\n';
 					totalcomment++;
-				}	
+				}
 			}
 			else {
 				// redirects......
@@ -596,7 +596,7 @@ else if (wgPageName.indexOf('Wikipedia:Articles_for_creation/') != -1 || wgPageN
 					 ], "afcHelper_onChange(this)");
 			text += reasonSelect;
 			text += '<br /><label for="afcHelper_comments">Additional comments (optional, signature is automatically added): </label><textarea rows="3" cols="60" name="afcHelper_comments" id="afcHelper_comments"></textarea>'+
-			'<label for="afcHelper_blank">Blank the submission (replace the content with {{<a href="'+wgArticlePath.replace("$1", 'Template:Afc_cleared')+'" title="Template:Afc cleared" target="_blank">afc cleared</a>}}):</label><input type="checkbox" name="afcHelper_blank" id="afcHelper_blank" onchange=afcHelper_trigger(\'afcHelper_extra_afccleared\') /><br/><div id="afcHelper_extra_afccleared" name="afcHelper_extra_afccleared" style="display:none"><label for="afcHelper_afccleared">Trigger the \'csd\' parameter and nominate the submission for CSD? (replace the content with {{<a href="'+wgArticlePath.replace("$1", 'Template:Afc_cleared')+'" title="Template:Afc cleared" target="_blank">afc cleared|csd</a>}}):</label><input type="checkbox" name="afcHelper_blank_csd" id="afcHelper_blank_csd" checked="checked" /><br/></div>' +	
+			'<label for="afcHelper_blank">Blank the submission (replace the content with {{<a href="'+wgArticlePath.replace("$1", 'Template:Afc_cleared')+'" title="Template:Afc cleared" target="_blank">afc cleared</a>}}):</label><input type="checkbox" name="afcHelper_blank" id="afcHelper_blank" onchange=afcHelper_trigger(\'afcHelper_extra_afccleared\') /><br/><div id="afcHelper_extra_afccleared" name="afcHelper_extra_afccleared" style="display:none"><label for="afcHelper_afccleared">Trigger the \'csd\' parameter and nominate the submission for CSD? (replace the content with {{<a href="'+wgArticlePath.replace("$1", 'Template:Afc_cleared')+'" title="Template:Afc cleared" target="_blank">afc cleared|csd</a>}}):</label><input type="checkbox" name="afcHelper_blank_csd" id="afcHelper_blank_csd" checked="checked" /><br/></div>' +
 			'<label for="afcHelper_notify">Notify author:</label><input type="checkbox" onchange=afcHelper_trigger(\'afcHelper_notify_Teahouse\') name="afcHelper_notify" id="afcHelper_notify" checked="checked" /><br/>' +
 			'<div id="afcHelper_notify_Teahouse"><label for="afcHelper_notify_Teahouse">Notify author about <a href="'+wgArticlePath.replace("$1", 'Wikipedia:Teahouse')+'" title="Wikipedia:Teahouse" target="_blank">Wikipedia:Teahouse</a> <small>(works only in combination with the normal notification)</small>:</label><input type="checkbox" name="afcHelper_Teahouse" id="afcHelper_Teahouse" /><br/></div><div id="afcHelper_extra_inline" name="afcHelper_extra_inline"></div><input type="button" id="afcHelper_prompt_button" name="afcHelper_prompt_button" value="Decline" onclick="afcHelper_act(\'decline\')" style="border-radius:3px; background-color:#ffcdd5" />';
 			document.getElementById('afcHelper_extra').innerHTML = text;
@@ -694,7 +694,7 @@ else if (wgPageName.indexOf('Wikipedia:Articles_for_creation/') != -1 || wgPageN
 						talktext += "no";
 					talktext += "|class=" + assessment + "|listas=" + listas + "\}\}";
 				}
-				
+
 				talktext +="\n\{\{subst:WPAFC/article|class=" + assessment + "\}\}\n"+talkAppend;
 				// disambig check
 				if(assessment == 'disambig'){
@@ -1262,10 +1262,12 @@ function() {
 		text = text.replace(/\<\!--- Important, do not remove this line before article has been created. ---\>/ig, "");
 		text = text.replace(/\<\!-- This will add a notice to the bottom of the page and won't blank it! The new template which says that your draft is waiting for a review will appear at the bottom; simply ignore the old \(grey\) drafted templates and the old \(red\) decline templates. A bot will update your article submission. Until then, please don't change anything in this text box and press "Save page". --\>/ig, "");
 		text = text.replace(/== Request review at \[\[WP:AFC\]\] ==\n/ig, "");
+		// Fixing issue #9
+		text = text.replace(/(?:\<\s*references\s*\>)((?:\<[^\<\>]*\>|[^\<\>])*)\<\s*references\s*\/\s*\>/ig, "{{reflist|refs=$1}}");
 		// Remove {{userspacedraft}}, {{userspace draft}}, {{user sandbox}}
 		text = text.replace(/\{\{(userspacedraft|userspace draft|user sandbox)(?:\{\{[^{}]*\}\}|[^}{])*\}\}/ig, "");
 		text = text.replace(/^[-]{4,}$/igm, "");
-		
+
 		var afc_re = /\{\{\s*afc submission\s*\|\s*[||h|r](?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/i;
 		var afc_alt = /\{\{\s*afc submission\s*\|\s*[^t](?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/i;
 		var afc_all = /\{\{\s*afc submission\s*\|\s*(?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/i;
@@ -1309,7 +1311,7 @@ function() {
 			for((i=submissiontemplates.length-1);i>=0;i--){
 				if(i==(submissiontemplates.length-1)){
 					var temp=submissiontemplates[i].toString();
-					if(find_shrinked.test(submissiontemplates[i])){	
+					if(find_shrinked.test(submissiontemplates[i])){
 						temp=temp.replace(find_shrinked, "");
 					}
 					text=temp+'\n'+text;
@@ -1352,6 +1354,9 @@ function() {
 		//Nmespaces WP (4) and WT (5)
 		//var afc_alltemplates= /\{\{\s*afc submission(?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/i;
 		//afc_all=text.match(afc_alltemplates);
+
+		// fix issue#1
+		pagetext = pagetext.replace(/\{\{AFC submission(\s*\|){0,2}ts\s*=\s*/gi, "{{AFC submission|||ts=");
 
 		//longer than 30 characters, but commonly added to the source code
 		texttest = pagetext.replace(/\<\!--  Bot generated title --\>/gi, "");
@@ -1525,7 +1530,7 @@ function afcHelper_turnvisible(type, bool){
 	if(bool)
 		document.getElementById(type).style.display = 'block'; //setAttribute("checked", "checked");
 	else
-		document.getElementById(type).style.display = 'none'; //document.getElementById("afcHelper_blank").removeAttribute("checked");		
+		document.getElementById(type).style.display = 'none'; //document.getElementById("afcHelper_blank").removeAttribute("checked");
 }
 }
 //</nowiki>
