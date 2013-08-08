@@ -330,6 +330,8 @@ function afcHelper_act(action) {
 		displayMessage('<ul id="afcHelper_status"></ul><ul id="afcHelper_finish"></ul>');
 		document.getElementById('afcHelper_finish').innerHTML += '<span id="afcHelper_finished_wrapper"><span id="afcHelper_finished_main" style="display:none"><li id="afcHelper_done"><b>Done (<a href="' + wgArticlePath.replace("$1", encodeURI(afcHelper_PageName)) + '?action=purge" title="' + afcHelper_PageName + '">Reload page</a>)</b></li></span></span>';
 		newtext = template + pagetext;
+    // Issue 98: Remove the defect category when we have a template on it (or if it was cought before)
+		newtext = newtext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 		newtext = afcHelper_cleanup(newtext);
 		afcHelper_editPage(afcHelper_PageName, newtext, "Tagging [[Wikipedia:Articles for creation]] draft", false);
 	} else if (action === 'g13') {
@@ -412,6 +414,8 @@ function afcHelper_act(action) {
 				return;
 			}
 			newtext = submit + pagetext;
+      // Issue 98: Truncate this defect category when we submit the page
+		  newtext = newtext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 			newtext = afcHelper_cleanup(newtext);
 			afcHelper_editPage(afcHelper_PageName, newtext, "Submitting [[Wikipedia:Articles for creation]] submission", false);
 		}
@@ -528,6 +532,8 @@ function afcHelper_act(action) {
 				pagetext = pagetext.replace(/\{\{:DEFAULTSORT:/gi, "\{\{:DEFAULTSORT:"); //fixes upper and lowercase problems!
 				// Remove Doncram's category on accept per issue #39
 				pagetext = pagetext.replace(/\[\[:?Category:Submissions by Doncram ready for review]]/gi, "");
+        // Issue 98: Remove this defect category if we're accepting it
+				newtext = newtext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 
 				// [[Template:L]]
 				var templatel = '\n';
@@ -760,6 +766,8 @@ function afcHelper_act(action) {
 		//first remove the multiple pending templates, otherwise one isn't recognized
 		pagetext = pagetext.replace(/\{\{\s*afc submission\s*\|\s*[||h|r](?:\{\{[^{}]*\}\}|[^}{])*\}\}/i, "");
 		pagetext = afcHelper_cleanup(pagetext);
+    // Issue 98: Remove the defect category when we have a template on it
+		pagetext = pagetext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 		afcHelper_editPage(afcHelper_PageName, pagetext, summary, false);
 	} else if (action === 'comment') {
 		var comment = $("#afcHelper_comments").val();
@@ -795,6 +803,8 @@ function afcHelper_act(action) {
 					pagetext = pagetext.substring(0, endindex) + '\n' + newComment + '\n----\n' + pagetext.substring(endindex);
 				}
 			}
+      // Issue 98: Remove the defect category when we have a template on it (or if it was cought before)
+		  pagetext = pagetext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 			afcHelper_editPage(afcHelper_PageName, pagetext, "Commenting on [[Wikipedia:Articles for creation]] submission", false);
 		}
 	} else if (action === 'mark') {
@@ -826,6 +836,8 @@ function afcHelper_act(action) {
 			return;
 		}
 		pagetext = pagetext.replace(afc_re, "$1r\|$3");
+    // Issue 98: Remove the defect category when we have a template on it (or if it was cought before)
+		pagetext = pagetext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 		afcHelper_editPage(afcHelper_PageName, pagetext, "Marking [[Wikipedia:Articles for creation]] submission as being reviewed", false);
 	} else if (action === 'unmark') {
 		displayMessage('<ul id="afcHelper_status"></ul><ul id="afcHelper_finish"></ul>');
@@ -836,11 +848,15 @@ function afcHelper_act(action) {
 			return;
 		}
 		pagetext = pagetext.replace(/\{\{\s*afc submission\s*\|\s*r\s*\|\s*\|/i, "\{\{AFC submission\|\|");
+    // Issue 98: Remove the defect category when we have a template on it (or if it was cought before)
+		pagetext = pagetext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 		afcHelper_editPage(afcHelper_PageName, pagetext, "Unmarking [[Wikipedia:Articles for creation]] submission as being reviewed", false);
 	} else if (action === 'cleanup') {
 		displayMessage('<ul id="afcHelper_status"></ul><ul id="afcHelper_finish"></ul>');
 		document.getElementById('afcHelper_finish').innerHTML += '<span id="afcHelper_finished_wrapper"><span id="afcHelper_finished_main" style="display:none"><li id="afcHelper_done"><b>Done (<a href="' + wgArticlePath.replace("$1", encodeURI(afcHelper_PageName)) + '?action=purge" title="' + afcHelper_PageName + '">Reload page</a>)</b></li></span></span>';
 		var text = afcHelper_getPageText(afcHelper_PageName, true, false);
+    // Issue 98: Remove the defect category when we have a template on it (or if it was cought before)
+		pagetext = pagetext.replace(/\[\[:?Category:AfC[_ ]submissions[_ ]with[_ ]missing[_ ]AfC[_ ]template\]\]/,"");
 		if (text === pagetext) document.getElementById('afcHelper_finish').innerHTML += '<span id="afcHelper_finished_wrapper"><span id="afcHelper_finished_main><li id="afcHelper_done"><b>This submission is already cleaned. Nothing changed. (<a href="' + wgArticlePath.replace("$1", encodeURI(afcHelper_PageName)) + '?action=purge" title="' + afcHelper_PageName + '">Reload page</a>)</b></li></span></span>';
 		else afcHelper_editPage(afcHelper_PageName, pagetext, "Cleaning the [[Wikipedia:Articles for creation]] submission.", false);
 	}
