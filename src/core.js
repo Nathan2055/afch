@@ -1,6 +1,9 @@
 //<nowiki>
 // Script should be located at [[MediaWiki:Gadget-afchelper.js/core.js]]
 
+function jqEsc(expression) {
+    return expression.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&');
+}
 importScript('User:Timotheus Canens/displaymessage.js');
 var afchelper_baseurl = mw.config.get('wgServer') + '/w/index.php?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js';
 
@@ -48,7 +51,7 @@ function afcHelper_escapeHtmlChars(original) {
 }
 
 function afcHelper_getPageText(title, show, redirectcheck) {
-	if (show) document.getElementById('afcHelper_status').innerHTML += '<li id="afcHelper_get' + escape(title) + '">Getting <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></li>';
+	if (show) $('#afcHelper_status').html($('#afcHelper_status').html() + '<li id="afcHelper_get' + jqEsc(title) + '">Getting <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></li>');
 	var req = sajax_init_object();
 	var params = "action=query&prop=revisions&rvprop=content&format=json&indexpageids=1&titles=" + encodeURIComponent(title);
 		if(redirectcheck)
@@ -58,10 +61,10 @@ function afcHelper_getPageText(title, show, redirectcheck) {
 	req.setRequestHeader("Content-length", params.length);
 	req.setRequestHeader("Connection", "close");
 	req.send(params);
-	var response = eval('(' + req.responseText + ')');
+	var response = eval('(' + req.responseText + ')'); /* Not using actual json makes kittens sad :( */
 	pageid = response['query']['pageids'][0];
 	if (pageid === "-1") {
-		if (show) document.getElementById('afcHelper_get' + escape(title)).innerHTML = 'The page <a class="new" href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a> does not exist';
+		if (show) $('#afcHelper_get' +jqEsc(title)).html('The page <a class="new" href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a> does not exist');
 		delete req;
 		return '';
 	}
@@ -72,7 +75,7 @@ function afcHelper_getPageText(title, show, redirectcheck) {
 			if ((typeof(oldusername) !== 'undefined') && (typeof(newusername) !== 'undefined') && (oldusername != newusername)){
 				usertalkpage = newusername;
 				if (show){
-					document.getElementById('afcHelper_status').innerHTML += '<li id="afcHelper_get' + escape(title) + '">Got <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + newusername + '">' + newusername + '</a> (page was renamed from ' + oldusername + ')</li>';
+					$('#afcHelper_status').html($('#afcHelper_status').html() + '<li id="afcHelper_get' + jqEsc(title) + '">Got <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + newusername + '">' + newusername + '</a> (page was renamed from ' + oldusername + ')</li>');
 				}
 			}else{
 				redirectcheck = false;
@@ -81,7 +84,7 @@ function afcHelper_getPageText(title, show, redirectcheck) {
 				redirectcheck = false;
 		}		
 	delete req;
-	if (show && !redirectcheck)	document.getElementById('afcHelper_status').innerHTML += '<li id="afcHelper_get' + escape(title) + '">Got <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></li>';
+	if (show && !redirectcheck)	$('#afcHelper_status').html($('#afcHelper_status').html() + '<li id="afcHelper_get' + jqEsc(title) + '">Got <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></li>');
 		return newtext;
 }
 
@@ -91,7 +94,7 @@ function afcHelper_editPage(title, newtext, summary, createonly) {
 	$("#afcHelper_finished_wrapper").html('<span id="afcHelper_AJAX_finished_' + afcHelper_AJAXnumber + '" style="display:none">' + $("#afcHelper_finished_wrapper").html() + '</span>');
 	var func_id = afcHelper_AJAXnumber;
 	afcHelper_AJAXnumber++;
-	document.getElementById('afcHelper_status').innerHTML += '<li id="afcHelper_edit' + escape(title) + '">Editing <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></li>';
+	$('#afcHelper_status').html($('#afcHelper_status').html() + '<li id="afcHelper_edit' + jqEsc(title) + '">Editing <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></li>');
 	var req = sajax_init_object();
 	var params = "action=edit&format=json&token=" + encodeURIComponent(token) + "&title=" + encodeURIComponent(title) + "&text=" + encodeURIComponent(newtext) + "&notminor=1&summary=" + encodeURIComponent(summary);
 	if (createonly) params += "&createonly=1";
@@ -102,15 +105,15 @@ function afcHelper_editPage(title, newtext, summary, createonly) {
 	req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
-			response = eval('(' + req.responseText + ')');
+			response = eval('(' + req.responseText + ')'); /* :( */
 			try {
 				if (response['edit']['result'] === "Success") {
-					document.getElementById('afcHelper_edit' + escape(title)).innerHTML = 'Saved <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a>';
+					$('#afcHelper_edit' + jqEsc(title)).html('Saved <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a>');
 				} else {
-					document.getElementById('afcHelper_edit' + escape(title)).innerHTML = '<div class="notice"><b>Edit failed on <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></b></div>. Error info:' + response['error']['code'] + ' : ' + response['error']['info'];
+					$('#afcHelper_edit' + jqEsc(title)).html('<div class="notice"><b>Edit failed on <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></b></div>. Error info:' + response['error']['code'] + ' : ' + response['error']['info']);
 				}
 			} catch (err) {
-				document.getElementById('afcHelper_edit' + escape(title)).innerHTML = '<div class="notice"><b>Edit failed on <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></b></div>';
+				$('#afcHelper_edit' + jqEsc(title)).html('<div class="notice"><b>Edit failed on <a href="' + wgArticlePath.replace("$1", encodeURI(title)) + '" title="' + title + '">' + title + '</a></b></div>');
 			}
 			$("#afcHelper_AJAX_finished_" + func_id).css("display", '');
 			delete req;
